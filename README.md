@@ -1,1 +1,3 @@
 # HTML-Projects
+
+This is where I keep all projects done with HTML/Javascript/CSS etc...
