@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+            rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" 
+            crossorigin="anonymous">
+</head>
+<body class=" bg-primary vh-100">
+    <div class="card col-6 offset-3 mt-5" id="divCreateUser">
+        <div class="card-header">
+            <h3>Create New Account</h3>
+        </div>
+        <div class="card-body">
+            <form class="must-validate">
+                <div class="mb-3">
+                    <input class="form-control" id="txtEmail" type="email" aria-label="Enter Email Address" placeholder="Email Address" required>
+                    <div class="invalid-feedback">Please Enter Your Email Address</div>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" id="txtFirstName" type="text" aria-label="First Name" placeholder="First Name" required>
+                    <div class="invalid-feedback">Please Enter Your First Name</div>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" id="txtLastName" type="text" aria-label="Last Name" placeholder="Last Name" required>
+                    <div class="invalid-feedback">Please Enter Your Last Name</div>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" id="txtPassword" type="password" aria-label="Enter Password" placeholder="Password" required>
+                    <div class="invalid-feedback">You Must Enter a Password</div>
+                </div>
+                <button class="btn btn-primary mt-4 col-12" type="button" id="btnCreate">Create User</button>
+               
+            </form>      
+        </div>
+    </div>
+    <div style="display: none;" class="card col-6 offset-3 mt-5" id="divInventory">
+        <div class="card-header">
+            <h3>Create User</h3>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="mb-3">
+                    <input class="form-control" id="txtEmail" type="email" aria-label="Enter Email Address" placeholder="Email Address" required>
+                    <div class="invalid-feedback">Please Enter Your Email Address</div>
+                </div>
+                
+                <div class="mb-3">
+                    <input class="form-control" id="txtPassword" type="password" aria-label="Enter Password" placeholder="Password" required>
+                    <div class="invalid-feedback">You Must Enter a Password</div>
+                </div>
+                <button class="btn btn-primary mt-4 col-12" type="button" id="btnLogin">Login</button>
+            </form>
+        </div>
+
+    </div> 
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js" 
+                    integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" 
+                    crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
+                integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
+                crossorigin="anonymous">
+    </script>
+    <script src="js/lib/sweetalert2@11.js"></script>
+    <script>
+        if(sessionStorage.getItem('SessionID')) {
+            $('#divLogin').slideDown();
+            $('#divInventory').slideUp();
+
+        }
+        $('#btnCreate').on('click', function(){
+         
+            let frmNewUser = document.querySelector('form')
+            frmNewUser.reportValidity();    
+            let strEmail = $('#txtEmail').val();
+            let strFirstName = $('#txtFirstName').val();
+            let strLastName = $('#txtLastName').val();
+            let strPassword = $('#txtPassword').val();
+            let blnError = false;
+            let strErrorMessage = '';
+            if(!strEmail){
+                blnError = true;
+                $('txtEmail').addClass('is-invalid');
+            }
+            if(!strFirstName){
+                blnError = true;
+                $('txtFirstName').addClass('is-invalid');
+            }
+            if(!strLastName){
+                blnError = true;
+                $('txtLastName').addClass('is-invalid');
+            }
+
+            if(!strPassword){
+                blnError = true;
+                $('txtPassword').addClass('is-invalid');
+            }
+            if(blnError == false){
+                $.post('https://www.swollenhippo.com/ReliableVehicles/api/users.php',{email:strEmail,firstName:strFirstName,lastName:strLastName,password:strPassword}).done(function(result){
+                    console.log(result);
+                    let objResult = JSON.parse(result);
+                    console.log(objResult);
+                    if(!objResult.Outcome){
+                        Swal.fire ({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: objResult.Error
+                        })
+                    } else {
+                        Swal.fire ({
+                            icon: 'success',
+                            title: 'Awesome',
+                            text: objResult.Outcome
+                        })
+                    }
+
+                })
+            }
+        })
+
+
+        $('#btnLogin').on('click', function(){
+
+            $('#divInventory').slideDown();
+            $('#divCreateUser').slideUp();
+    
+            let frmNewUser = document.querySelector('form')
+            frmNewUser.reportValidity();    
+            let strEmail = $('#txtEmail').val();
+            let strPassword = $('#txtPassword').val();
+            let blnError = false;
+            let strErrorMessage = '';
+            if(!strEmail){
+                blnError = true;
+                $('txtEmail').addClass('is-invalid');
+            }
+            if(!strPassword){
+                blnError = true;
+                $('txtPassword').addClass('is-invalid');
+            }
+            if(blnError == false){
+                $.post('https://www.swollenhippo.com/ReliableVehicles/api/sessions.php',{email:strEmail,password:strPassword}).done(function(result){
+                    console.log(result);
+                    const objResult = JSON.parse(result);
+                    console.log(objResult);
+                    if(objResult.SessionID){
+                        $('txtEmail').val('');
+                        $('txtPassword').val('');
+                        sessionStorage.setItem("SessionID", objResult.SessionID);
+                        $('#divCreateUser').addClass('d-none');
+                        $('#divInventory').removeClass('d-none');
+                    } else {
+                        Swal.fire ({
+                            icon: 'error',
+                            title: 'oh no',
+                            text: 'Looks like your username or password were incorrect'
+                        });
+                    }
+
+                })
+            }
+        })
+
+        $('#btnInventorySearch').on('click', function(){
+        const strSessionID = sessionStorage.getItem('SessionID');
+        let strMake = $('#txtInventoryMake').val();
+        let frmNewUser = document.querySelector('form')
+        frmNewUser.reportValidity();    
+        let strEmail = $('#txtEmail').val();
+        let strPassword = $('#txtPassword').val();
+        let blnError = false;
+        let strErrorMessage = '';
+        if(!strEmail){
+            blnError = true;
+            $('txtEmail').addClass('is-invalid');
+        }
+        if(!strPassword){
+            blnError = true;
+            $('txtPassword').addClass('is-invalid');
+        }
+        if(blnError == false){
+            $.getJSON('https://www.swollenhippo.com/ReliableVehicles/api/Inventory.php',{session:strSessionID, make:strMake }).done(function(result){
+                console.table(result);
+            })
+        }
+    })
+    </script>
+</body>
+</html>
